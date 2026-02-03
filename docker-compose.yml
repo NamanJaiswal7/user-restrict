@@ -9,18 +9,39 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT}:5432"
+      - "5436:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./migrations/000001_init_schema.up.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
 
   redis:
     image: redis:7-alpine
     container_name: user_restriction_redis
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6381:6379"
     volumes:
       - redis_data:/data
+    restart: always
+
+  api:
+    build: .
+    container_name: user_restriction_api
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      - APP_ENV=${APP_ENV}
+      - SERVER_PORT=${SERVER_PORT}
+      - DB_HOST=postgres
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_SSL_MODE=${DB_SSL_MODE}
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      - postgres
+      - redis
     restart: always
 
 volumes:

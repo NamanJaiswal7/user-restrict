@@ -28,17 +28,21 @@ A robust Go service for managing user account restrictions, appeals, and audit t
 
 ### Running the Application
 
-1. **Start Infrastructure**:
+### Running the Application
+
+1. **Start Infrastructure & App**:
    ```bash
-   docker-compose up -d
+   docker-compose up -d --build
    ```
 
-2. **Run the Server**:
-   ```bash
-   go run cmd/server/main.go
-   ```
+   The server will start on port `8085` (to avoid common port conflicts).
 
-   The server will start on port `8080`.
+### Testing
+
+Run the included manual test script to verify functionality:
+```bash
+./scripts/manual_test.sh
+```
 
 ### API Endpoints
 

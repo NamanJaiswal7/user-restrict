@@ -25,3 +25,4 @@ go.sum
 
 # Environment
 .env
+commit.sh

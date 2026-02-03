@@ -2,10 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"user-restriction-manager/internal/api"
 	"user-restriction-manager/internal/api/handler"
@@ -48,7 +46,7 @@ func main() {
 
 	// Services
 	restrictionService := service.NewRestrictionService(restrictionRepo, cacheRepo)
-	appealService := service.NewAppealService(appealRepo, restrictionRepo)
+	appealService := service.NewAppealService(appealRepo, restrictionRepo, cacheRepo)
 
 	// Handlers
 	restrictionHandler := handler.NewRestrictionHandler(restrictionService)

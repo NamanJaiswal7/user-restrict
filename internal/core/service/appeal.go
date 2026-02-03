@@ -14,13 +14,14 @@ import (
 type AppealService struct {
 	appealRepo      ports.AppealRepository
 	restrictionRepo ports.RestrictionRepository
-	// notificationService ports.NotificationService // Future
+	cache           ports.CacheRepository
 }
 
-func NewAppealService(appealRepo ports.AppealRepository, restrictionRepo ports.RestrictionRepository) *AppealService {
+func NewAppealService(appealRepo ports.AppealRepository, restrictionRepo ports.RestrictionRepository, cache ports.CacheRepository) *AppealService {
 	return &AppealService{
 		appealRepo:      appealRepo,
 		restrictionRepo: restrictionRepo,
+		cache:           cache,
 	}
 }
 
@@ -60,6 +61,11 @@ func (s *AppealService) ReviewAppeal(ctx context.Context, appealID uuid.UUID, re
 	if status == domain.AppealStatusApproved {
 		if err := s.restrictionRepo.UpdateStatus(ctx, appeal.RestrictionID, domain.RestrictionStatusRevoked); err != nil {
 			return fmt.Errorf("service: failed to revoke restriction after appeal approval: %w", err)
+		}
+		
+		// Invalidate cache
+		if err := s.cache.Invalidate(ctx, appeal.UserID); err != nil {
+			fmt.Printf("warning: failed to invalidate cache for user %s: %v\n", appeal.UserID, err)
 		}
 	}
 
